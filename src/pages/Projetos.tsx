@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Lightbulb, Users, Calendar, TrendingUp, Filter, Loader2, Check } from "lucide-react";
+import { Lightbulb, Users, Calendar, TrendingUp, Filter } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { mockProjects } from "@/lib/mockData";
-import { useApp } from "@/contexts/AppContext";
-import { toast } from "sonner";
 
 const typeColors = {
   Social: "bg-primary/10 text-primary",
@@ -24,28 +22,12 @@ const difficultyColors = {
 export default function Projetos() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
-  const [loadingProject, setLoadingProject] = useState<string | null>(null);
-  const { projectParticipations, toggleProjectParticipation } = useApp();
 
   const filteredProjects = mockProjects.filter(project => {
     if (typeFilter !== "all" && project.type !== typeFilter) return false;
     if (difficultyFilter !== "all" && project.difficulty !== difficultyFilter) return false;
     return true;
   });
-
-  const handleParticipate = (projectId: string) => {
-    setLoadingProject(projectId);
-    
-    setTimeout(() => {
-      toggleProjectParticipation(projectId);
-      setLoadingProject(null);
-      
-      toast.success("Match realizado! 🎉", {
-        description: "A organização entrará em contato.",
-        duration: 3000,
-      });
-    }, 1000);
-  };
 
   return (
     <div className="space-y-6">
@@ -57,7 +39,7 @@ export default function Projetos() {
       </div>
 
       {/* Filters */}
-      <Card className="backdrop-blur-md bg-card/80 border-border/50">
+      <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Filter className="h-5 w-5" />
@@ -99,86 +81,62 @@ export default function Projetos() {
 
       {/* Projects Grid */}
       <div className="grid gap-6 md:grid-cols-2">
-        {filteredProjects.map((project, index) => {
-          const isParticipating = projectParticipations[project.id];
-          const isLoading = loadingProject === project.id;
-
-          return (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="hover:shadow-lg transition-all h-full flex flex-col backdrop-blur-md bg-card/80 border-border/50">
-                <CardHeader>
-                  <div className="flex items-start justify-between mb-2">
-                    <Badge variant="outline" className={typeColors[project.type as keyof typeof typeColors]}>
-                      {project.type}
-                    </Badge>
-                    <Badge variant="outline" className={difficultyColors[project.difficulty as keyof typeof difficultyColors]}>
-                      {project.difficulty}
-                    </Badge>
+        {filteredProjects.map((project, index) => (
+          <motion.div
+            key={project.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <Card className="hover:shadow-lg transition-all h-full flex flex-col">
+              <CardHeader>
+                <div className="flex items-start justify-between mb-2">
+                  <Badge variant="outline" className={typeColors[project.type as keyof typeof typeColors]}>
+                    {project.type}
+                  </Badge>
+                  <Badge variant="outline" className={difficultyColors[project.difficulty as keyof typeof difficultyColors]}>
+                    {project.difficulty}
+                  </Badge>
+                </div>
+                <CardTitle className="text-xl">{project.title}</CardTitle>
+                <CardDescription>{project.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 flex flex-col">
+                <div className="space-y-3 flex-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Users className="h-4 w-4" />
+                    {project.participants} participantes
                   </div>
-                  <CardTitle className="text-xl">{project.title}</CardTitle>
-                  <CardDescription>{project.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
-                  <div className="space-y-3 flex-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      {project.participants} participantes
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    Duração: {project.duration}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Skills relacionadas
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      Duração: {project.duration}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 text-sm font-medium mb-2">
-                        <TrendingUp className="h-4 w-4" />
-                        Skills relacionadas
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {project.skills.map((skill) => (
-                          <Badge key={skill} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
+                    <div className="flex flex-wrap gap-2">
+                      {project.skills.map((skill) => (
+                        <Badge key={skill} variant="secondary" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                  <Button 
-                    className="w-full mt-4"
-                    variant={isParticipating ? "outline" : "default"}
-                    onClick={() => !isParticipating && handleParticipate(project.id)}
-                    disabled={isLoading || isParticipating}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processando...
-                      </>
-                    ) : isParticipating ? (
-                      <>
-                        <Check className="mr-2 h-4 w-4" />
-                        Inscrito
-                      </>
-                    ) : (
-                      <>
-                        <Lightbulb className="mr-2 h-4 w-4" />
-                        Participar do Projeto
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
+                </div>
+                <Button className="w-full mt-4">
+                  <Lightbulb className="mr-2 h-4 w-4" />
+                  Participar do Projeto
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
       </div>
 
       {filteredProjects.length === 0 && (
-        <Card className="backdrop-blur-md bg-card/80 border-border/50">
+        <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">
               Nenhum projeto encontrado com esses filtros.

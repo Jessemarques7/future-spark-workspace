@@ -12,9 +12,9 @@ const navigation = [
 
 export function Sidebar() {
   return (
-    <aside className="fixed left-0 top-0 z-50 h-screen w-64 border-r bg-sidebar">
+    <aside className="fixed left-0 top-0 z-50 h-screen w-64 border-r bg-sidebar/80 backdrop-blur-xl">
       <div className="flex h-16 items-center gap-2 border-b px-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-lg shadow-primary/50">
           <Brain className="h-6 w-6 text-white" />
         </div>
         <div>
@@ -33,7 +33,7 @@ export function Sidebar() {
               "transition-all duration-200",
               "hover:bg-sidebar-accent"
             )}
-            activeClassName="bg-sidebar-accent text-sidebar-primary font-semibold shadow-md"
+            activeClassName="bg-sidebar-accent text-sidebar-primary font-semibold shadow-md shadow-primary/30 [&>svg]:drop-shadow-[0_0_8px_hsl(var(--primary))]"
           >
             <item.icon className="h-5 w-5" />
             {item.name}

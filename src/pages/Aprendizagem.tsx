@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Clock, TrendingUp, CheckCircle2, Circle, PlayCircle, Award } from "lucide-react";
+import { BookOpen, Clock, TrendingUp, CheckCircle2, Circle, PlayCircle, Award, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { mockModules } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
+import { useGamification } from "@/contexts/GamificationContext";
 import confetti from "canvas-confetti";
 
 const statusConfig = {
@@ -26,7 +28,10 @@ const levelColors = {
 export default function Aprendizagem() {
   const [selectedModule, setSelectedModule] = useState<typeof mockModules[0] | null>(null);
   const [modules, setModules] = useState(mockModules);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(0);
   const { toast } = useToast();
+  const { addXP, unlockBadge } = useGamification();
 
   const toggleTask = (moduleId: string, taskId: string) => {
     setModules(prev =>
@@ -62,9 +67,44 @@ export default function Aprendizagem() {
       )
     );
 
+    // Adicionar 150 XP
+    const result = addXP(150);
+
+    // Verificar se subiu de nível
+    if (result.leveledUp) {
+      setNewLevel(result.newLevel);
+      setShowLevelUp(true);
+      
+      // Confetti extra para level up
+      confetti({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.5 }
+      });
+    }
+
+    // Desbloquear badge se completou 3 módulos
+    const completedCount = modules.filter(m => m.status === "completed").length + 1;
+    if (completedCount === 3) {
+      unlockBadge({
+        id: "first_3_modules",
+        name: "Explorador Iniciante",
+        description: "Complete 3 módulos de aprendizagem",
+        icon: "🎯"
+      });
+    }
+    if (completedCount === 5) {
+      unlockBadge({
+        id: "first_5_modules",
+        name: "Estudante Dedicado",
+        description: "Complete 5 módulos de aprendizagem",
+        icon: "📚"
+      });
+    }
+
     // Show success toast
     toast({
-      title: "🎉 Parabéns! Você ganhou +50 XP",
+      title: "🎉 Parabéns! Você ganhou +150 XP",
       description: `Módulo "${selectedModule.title}" concluído com sucesso!`,
     });
 
@@ -227,6 +267,38 @@ export default function Aprendizagem() {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Level Up Dialog */}
+      <Dialog open={showLevelUp} onOpenChange={setShowLevelUp}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center gap-4 py-6"
+            >
+              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center">
+                <Sparkles className="h-10 w-10 text-white" />
+              </div>
+              <DialogTitle className="text-3xl text-center">
+                Parabéns! 🎉
+              </DialogTitle>
+              <DialogDescription className="text-center text-lg">
+                Você subiu para o <span className="font-bold text-primary">Nível {newLevel}</span>!
+              </DialogDescription>
+            </motion.div>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-4">
+            <p className="text-center text-muted-foreground text-sm">
+              Continue assim para desbloquear mais conquistas e habilidades!
+            </p>
+            <Button onClick={() => setShowLevelUp(false)} className="w-full">
+              Continuar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

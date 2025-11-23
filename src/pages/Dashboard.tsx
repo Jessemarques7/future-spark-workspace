@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Smile, Frown, Meh, TrendingUp, BookOpen, Lightbulb, Zap } from "lucide-react";
+import { Smile, Frown, Meh, TrendingUp, BookOpen, Lightbulb, Zap, Award, Trophy } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGamification } from "@/contexts/GamificationContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { mockRecommendations } from "@/lib/mockData";
 
@@ -23,9 +25,11 @@ const skills = [
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { level, currentXP, xpToNextLevel, badges } = useGamification();
   const [mood, setMood] = useState<string>("");
 
   const firstName = user?.name?.split(" ")[0] || "Usuário";
+  const xpPercentage = (currentXP / xpToNextLevel) * 100;
 
   const container = {
     hidden: { opacity: 0 },
@@ -42,9 +46,25 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Olá, {firstName}! 👋</h1>
-        <p className="text-muted-foreground">Veja como está seu progresso hoje</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Olá, {firstName}! 👋</h1>
+          <p className="text-muted-foreground">Veja como está seu progresso hoje</p>
+        </div>
+        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 min-w-[200px]">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-primary flex items-center justify-center">
+                <Trophy className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-primary">Nível {level}</div>
+                <p className="text-xs text-muted-foreground">{currentXP} / {xpToNextLevel} XP</p>
+              </div>
+            </div>
+            <Progress value={xpPercentage} className="h-2 mt-3" />
+          </CardContent>
+        </Card>
       </div>
 
       <motion.div
@@ -127,9 +147,9 @@ export default function Dashboard() {
         </motion.div>
       </motion.div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Recommendations */}
-        <Card>
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-primary" />
@@ -157,28 +177,62 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Skills Progress */}
+        {/* Badges */}
         <Card>
           <CardHeader>
-            <CardTitle>Progresso de Skills</CardTitle>
-            <CardDescription>Suas habilidades em desenvolvimento</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5 text-warning" />
+              Conquistas
+            </CardTitle>
+            <CardDescription>Suas badges mais recentes</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {skills.map((skill) => (
-              <div key={skill.name} className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{skill.name}</span>
-                  <span className="text-muted-foreground">{skill.progress}%</span>
-                </div>
-                <Progress value={skill.progress} className="h-2" />
+          <CardContent className="space-y-3">
+            {badges.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                <Award className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                <p>Complete módulos para desbloquear conquistas!</p>
               </div>
-            ))}
-            <Button variant="outline" className="w-full mt-4">
-              Ver Todas as Skills
-            </Button>
+            ) : (
+              badges.slice(0, 3).map((badge) => (
+                <div
+                  key={badge.id}
+                  className="flex items-start gap-3 p-3 rounded-xl bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20"
+                >
+                  <div className="text-3xl">{badge.icon}</div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm mb-1">{badge.name}</h4>
+                    <p className="text-xs text-muted-foreground">{badge.description}</p>
+                  </div>
+                </div>
+              ))
+            )}
+            {badges.length > 3 && (
+              <Button variant="outline" className="w-full mt-2" size="sm">
+                Ver Todas ({badges.length})
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Skills Progress */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Progresso de Skills</CardTitle>
+          <CardDescription>Suas habilidades em desenvolvimento</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-3">
+          {skills.map((skill) => (
+            <div key={skill.name} className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">{skill.name}</span>
+                <span className="text-muted-foreground">{skill.progress}%</span>
+              </div>
+              <Progress value={skill.progress} className="h-2" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, Clock, TrendingUp, CheckCircle2, Circle, PlayCircle } from "lucide-react";
+import { BookOpen, Clock, TrendingUp, CheckCircle2, Circle, PlayCircle, Award } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Progress } from "@/components/ui/progress";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { mockModules } from "@/lib/mockData";
+import { useToast } from "@/hooks/use-toast";
+import confetti from "canvas-confetti";
 
 const statusConfig = {
   not_started: { label: "Não iniciado", color: "bg-muted" },
@@ -24,6 +26,7 @@ const levelColors = {
 export default function Aprendizagem() {
   const [selectedModule, setSelectedModule] = useState<typeof mockModules[0] | null>(null);
   const [modules, setModules] = useState(mockModules);
+  const { toast } = useToast();
 
   const toggleTask = (moduleId: string, taskId: string) => {
     setModules(prev =>
@@ -40,9 +43,43 @@ export default function Aprendizagem() {
     );
   };
 
+  const completeModule = () => {
+    if (!selectedModule) return;
+
+    // Trigger confetti animation
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    // Update module status to completed
+    setModules(prev =>
+      prev.map(module =>
+        module.id === selectedModule.id
+          ? { ...module, status: "completed" as const }
+          : module
+      )
+    );
+
+    // Show success toast
+    toast({
+      title: "🎉 Parabéns! Você ganhou +50 XP",
+      description: `Módulo "${selectedModule.title}" concluído com sucesso!`,
+    });
+
+    // Close drawer
+    setSelectedModule(null);
+  };
+
   const completedTasks = selectedModule?.tasks.filter(t => t.completed).length || 0;
   const totalTasks = selectedModule?.tasks.length || 1;
   const progressPercent = (completedTasks / totalTasks) * 100;
+
+  // Calculate overall progress
+  const completedModules = modules.filter(m => m.status === "completed").length;
+  const totalModules = modules.length;
+  const overallProgress = (completedModules / totalModules) * 100;
 
   return (
     <div className="space-y-6">
@@ -52,6 +89,27 @@ export default function Aprendizagem() {
           Módulos personalizados para desenvolver suas habilidades
         </p>
       </div>
+
+      {/* Overall Progress Bar */}
+      <Card className="bg-gradient-to-br from-primary/5 to-primary/10">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-12 w-12 rounded-2xl bg-gradient-primary flex items-center justify-center">
+              <Award className="h-6 w-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg">Nível Atual: Explorador do Futuro</h3>
+              <p className="text-sm text-muted-foreground">
+                {completedModules} de {totalModules} módulos concluídos
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-primary">{Math.round(overallProgress)}%</div>
+            </div>
+          </div>
+          <Progress value={overallProgress} className="h-3" />
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6">
         {modules.map((module, index) => (
@@ -160,8 +218,9 @@ export default function Aprendizagem() {
                 <Button
                   className="w-full h-11"
                   disabled={progressPercent < 100}
+                  onClick={completeModule}
                 >
-                  {progressPercent === 100 ? "Módulo Concluído!" : "Concluir Módulo"}
+                  {progressPercent === 100 ? "🎉 Concluir Módulo" : "Concluir Módulo"}
                 </Button>
               </div>
             </>

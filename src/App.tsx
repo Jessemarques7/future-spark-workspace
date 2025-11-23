@@ -9,6 +9,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { GamificationProvider } from "./contexts/GamificationContext";
 import { AIProvider } from "./contexts/AIContext";
+import { ProjectsProvider } from "./contexts/ProjectsContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Aprendizagem from "./pages/Aprendizagem";
@@ -30,11 +31,12 @@ const App = () => (
       <AuthProvider>
         <GamificationProvider>
           <AIProvider>
-            <NotificationProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
+            <ProjectsProvider>
+              <NotificationProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
                   <Routes>
                     <Route path="/" element={<Navigate to="/login" replace />} />
                     <Route path="/login" element={<Login />} />
@@ -55,6 +57,7 @@ const App = () => (
                 </BrowserRouter>
               </TooltipProvider>
             </NotificationProvider>
+          </ProjectsProvider>
           </AIProvider>
         </GamificationProvider>
       </AuthProvider>

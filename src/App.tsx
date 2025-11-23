@@ -14,6 +14,10 @@ import BemEstar from "./pages/BemEstar";
 import Projetos from "./pages/Projetos";
 import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
+import Respiracao from "./pages/wellness/Respiracao";
+import Alongamento from "./pages/wellness/Alongamento";
+import Meditacao from "./pages/wellness/Meditacao";
+import Gratidao from "./pages/wellness/Gratidao";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +37,10 @@ const App = () => (
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/aprendizagem" element={<Aprendizagem />} />
                   <Route path="/bem-estar" element={<BemEstar />} />
+                  <Route path="/bem-estar/respiracao" element={<Respiracao />} />
+                  <Route path="/bem-estar/alongamento" element={<Alongamento />} />
+                  <Route path="/bem-estar/meditacao" element={<Meditacao />} />
+                  <Route path="/bem-estar/gratidao" element={<Gratidao />} />
                   <Route path="/projetos" element={<Projetos />} />
                   <Route path="/configuracoes" element={<Configuracoes />} />
                 </Route>

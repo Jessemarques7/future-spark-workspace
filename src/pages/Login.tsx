@@ -6,13 +6,46 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.email || !formData.password) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isLogin && !formData.name) {
+      toast({
+        title: "Erro",
+        description: "Preencha seu nome completo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    login(formData.email, formData.password, formData.name);
+    toast({
+      title: isLogin ? "Bem-vindo de volta!" : "Conta criada!",
+      description: isLogin ? "Login realizado com sucesso" : "Sua conta foi criada com sucesso",
+    });
     navigate("/dashboard");
   };
 
@@ -89,7 +122,13 @@ export default function Login() {
               {!isLogin && (
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome completo</Label>
-                  <Input id="name" placeholder="João Silva" required />
+                  <Input 
+                    id="name" 
+                    placeholder="João Silva" 
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    required={!isLogin}
+                  />
                 </div>
               )}
               
@@ -102,6 +141,8 @@ export default function Login() {
                     type="email"
                     placeholder="seu@email.com"
                     className="pl-9"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     required
                   />
                 </div>
@@ -116,6 +157,8 @@ export default function Login() {
                     type="password"
                     placeholder="••••••••"
                     className="pl-9"
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                     required
                   />
                 </div>

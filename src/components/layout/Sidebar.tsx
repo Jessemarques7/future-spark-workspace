@@ -1,4 +1,4 @@
-import { Brain, LayoutDashboard, BookOpen, Heart, Lightbulb, Settings } from "lucide-react";
+import { Brain, LayoutDashboard, BookOpen, Heart, Lightbulb, Settings, Sparkles } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +7,7 @@ const navigation = [
   { name: "Aprendizagem", href: "/aprendizagem", icon: BookOpen },
   { name: "Bem-estar", href: "/bem-estar", icon: Heart },
   { name: "Projetos", href: "/projetos", icon: Lightbulb },
+  { name: "Workrooms", href: "/workrooms", icon: Sparkles },
   { name: "Configurações", href: "/configuracoes", icon: Settings },
 ];
 

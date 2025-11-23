@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Smile, Frown, Meh, TrendingUp, BookOpen, Lightbulb, Zap } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -21,7 +22,10 @@ const skills = [
 ];
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [mood, setMood] = useState<string>("");
+
+  const firstName = user?.name?.split(" ")[0] || "Usuário";
 
   const container = {
     hidden: { opacity: 0 },
@@ -39,7 +43,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Olá, João! 👋</h1>
+        <h1 className="text-3xl font-bold mb-2">Olá, {firstName}! 👋</h1>
         <p className="text-muted-foreground">Veja como está seu progresso hoje</p>
       </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Heart, Smile, Frown, Meh, TrendingUp, Wind, Move, Brain } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ const iconMap: Record<string, any> = {
 };
 
 export default function BemEstar() {
+  const navigate = useNavigate();
   const [todayMood, setTodayMood] = useState<string>("");
 
   const chartData = mockMoodHistory.map(entry => ({
@@ -140,7 +142,20 @@ export default function BemEstar() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">{tip.description}</p>
-                    <Button variant="outline" size="sm" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => {
+                        const routes: Record<string, string> = {
+                          "1": "/bem-estar/respiracao",
+                          "2": "/bem-estar/alongamento",
+                          "3": "/bem-estar/meditacao",
+                          "4": "/bem-estar/gratidao",
+                        };
+                        navigate(routes[tip.id]);
+                      }}
+                    >
                       Começar
                     </Button>
                   </CardContent>

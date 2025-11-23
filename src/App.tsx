@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import Aprendizagem from "./pages/Aprendizagem";
 import BemEstar from "./pages/BemEstar";
 import Projetos from "./pages/Projetos";
+import Workrooms from "./pages/Workrooms";
 import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 import Respiracao from "./pages/wellness/Respiracao";
@@ -46,6 +47,7 @@ const App = () => (
                       <Route path="/bem-estar/meditacao" element={<Meditacao />} />
                       <Route path="/bem-estar/gratidao" element={<Gratidao />} />
                       <Route path="/projetos" element={<Projetos />} />
+                      <Route path="/workrooms" element={<Workrooms />} />
                       <Route path="/configuracoes" element={<Configuracoes />} />
                     </Route>
                     <Route path="*" element={<NotFound />} />

@@ -71,10 +71,22 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     const savedSettings = localStorage.getItem("notificationSettings");
     
     if (savedNotifications) {
-      setNotifications(JSON.parse(savedNotifications).map((n: any) => ({
-        ...n,
-        createdAt: new Date(n.createdAt),
-      })));
+      setNotifications(JSON.parse(savedNotifications).map((n: any) => {
+        // Backward compatibility: infer link when missing
+        let inferredLink: string | undefined = n.link;
+        if (!inferredLink) {
+          if (n.type === "learning") inferredLink = "/aprendizagem";
+          else if (n.type === "wellness") inferredLink = "/bem-estar";
+          else if (n.type === "project") inferredLink = "/projetos";
+          else if (n.type === "system") inferredLink = "/dashboard";
+        }
+
+        return {
+          ...n,
+          link: inferredLink,
+          createdAt: new Date(n.createdAt),
+        } as Notification;
+      }));
     } else {
       setNotifications(defaultNotifications);
       localStorage.setItem("notifications", JSON.stringify(defaultNotifications));

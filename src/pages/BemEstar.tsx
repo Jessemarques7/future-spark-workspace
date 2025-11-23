@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { mockMoodHistory, mockWellnessTips } from "@/lib/mockData";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { useAI } from "@/contexts/AIContext";
+import { useToast } from "@/hooks/use-toast";
 
 const moodOptions = [
   { value: "happy", label: "Feliz", icon: Smile, color: "text-success" },
@@ -24,7 +27,43 @@ const iconMap: Record<string, any> = {
 
 export default function BemEstar() {
   const navigate = useNavigate();
+  const { addNotification } = useNotifications();
+  const { addPriorityRecommendation } = useAI();
+  const { toast } = useToast();
   const [todayMood, setTodayMood] = useState<string>("");
+
+  const handleMoodChange = (mood: string) => {
+    setTodayMood(mood);
+
+    // Se o usuário está estressado ou cansado, gerar resposta da IA
+    if (mood === "stressed" || mood === "tired") {
+      const moodText = mood === "stressed" ? "estressado" : "cansado";
+      
+      // Adicionar notificação de wellness
+      addNotification({
+        type: "wellness",
+        title: `Notei que você está ${moodText}`,
+        description: "Que tal uma pausa estratégica? Um exercício de respiração pode ajudar.",
+      });
+
+      // Adicionar recomendação prioritária no Dashboard
+      addPriorityRecommendation({
+        type: "wellness",
+        title: "🧘‍♀️ Exercício de Respiração 4-7-8",
+        description: `Detectei que você está ${moodText}. Este exercício vai ajudar a restaurar seu equilíbrio e reduzir o estresse rapidamente.`,
+        actionText: "Fazer agora",
+        actionRoute: "/bem-estar/respiracao",
+        icon: "Wind",
+        priority: 100, // Máxima prioridade
+      });
+
+      // Toast imediato
+      toast({
+        title: "💙 Cuide de você",
+        description: `Notei que você está ${moodText}. Preparei uma recomendação especial para você.`,
+      });
+    }
+  };
 
   const chartData = mockMoodHistory.map(entry => ({
     date: new Date(entry.date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
@@ -51,7 +90,7 @@ export default function BemEstar() {
             <CardDescription>Como você está se sentindo hoje?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Select value={todayMood} onValueChange={setTodayMood}>
+            <Select value={todayMood} onValueChange={handleMoodChange}>
               <SelectTrigger className="w-full h-12">
                 <SelectValue placeholder="Selecione seu humor" />
               </SelectTrigger>

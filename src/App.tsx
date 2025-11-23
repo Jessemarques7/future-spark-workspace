@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { GamificationProvider } from "./contexts/GamificationContext";
+import { AIProvider } from "./contexts/AIContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Aprendizagem from "./pages/Aprendizagem";
@@ -27,30 +28,32 @@ const App = () => (
     <ThemeProvider>
       <AuthProvider>
         <GamificationProvider>
-          <NotificationProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Navigate to="/login" replace />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route element={<AppLayout />}>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/aprendizagem" element={<Aprendizagem />} />
-                    <Route path="/bem-estar" element={<BemEstar />} />
-                    <Route path="/bem-estar/respiracao" element={<Respiracao />} />
-                    <Route path="/bem-estar/alongamento" element={<Alongamento />} />
-                    <Route path="/bem-estar/meditacao" element={<Meditacao />} />
-                    <Route path="/bem-estar/gratidao" element={<Gratidao />} />
-                    <Route path="/projetos" element={<Projetos />} />
-                    <Route path="/configuracoes" element={<Configuracoes />} />
-                  </Route>
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </NotificationProvider>
+          <AIProvider>
+            <NotificationProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/login" replace />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route element={<AppLayout />}>
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="/aprendizagem" element={<Aprendizagem />} />
+                      <Route path="/bem-estar" element={<BemEstar />} />
+                      <Route path="/bem-estar/respiracao" element={<Respiracao />} />
+                      <Route path="/bem-estar/alongamento" element={<Alongamento />} />
+                      <Route path="/bem-estar/meditacao" element={<Meditacao />} />
+                      <Route path="/bem-estar/gratidao" element={<Gratidao />} />
+                      <Route path="/projetos" element={<Projetos />} />
+                      <Route path="/configuracoes" element={<Configuracoes />} />
+                    </Route>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BrowserRouter>
+              </TooltipProvider>
+            </NotificationProvider>
+          </AIProvider>
         </GamificationProvider>
       </AuthProvider>
     </ThemeProvider>

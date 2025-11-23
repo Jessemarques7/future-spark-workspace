@@ -26,12 +26,17 @@ const levelColors = {
 };
 
 export default function Aprendizagem() {
-  const [selectedModule, setSelectedModule] = useState<typeof mockModules[0] | null>(null);
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
   const [modules, setModules] = useState(mockModules);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
   const { toast } = useToast();
   const { addXP, unlockBadge } = useGamification();
+
+  // Get the current selected module from the updated modules state
+  const selectedModule = selectedModuleId 
+    ? modules.find(m => m.id === selectedModuleId) || null
+    : null;
 
   const toggleTask = (moduleId: string, taskId: string) => {
     setModules(prev =>
@@ -109,7 +114,7 @@ export default function Aprendizagem() {
     });
 
     // Close drawer
-    setSelectedModule(null);
+    setSelectedModuleId(null);
   };
 
   const completedTasks = selectedModule?.tasks.filter(t => t.completed).length || 0;
@@ -161,7 +166,7 @@ export default function Aprendizagem() {
           >
             <Card
               className="cursor-pointer hover:shadow-lg transition-all"
-              onClick={() => setSelectedModule(module)}
+              onClick={() => setSelectedModuleId(module.id)}
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -208,7 +213,7 @@ export default function Aprendizagem() {
       </div>
 
       {/* Module Detail Drawer */}
-      <Sheet open={!!selectedModule} onOpenChange={() => setSelectedModule(null)}>
+      <Sheet open={!!selectedModule} onOpenChange={() => setSelectedModuleId(null)}>
         <SheetContent className="sm:max-w-md overflow-y-auto">
           {selectedModule && (
             <>

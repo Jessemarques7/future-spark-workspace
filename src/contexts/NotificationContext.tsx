@@ -21,6 +21,7 @@ interface NotificationContextType {
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
   updateSettings: (settings: Partial<NotificationSettings>) => void;
+  addNotification: (notification: Omit<Notification, "id" | "createdAt" | "read">) => void;
   unreadCount: number;
 }
 
@@ -104,10 +105,25 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const addNotification = (notification: Omit<Notification, "id" | "createdAt" | "read">) => {
+    const newNotification: Notification = {
+      ...notification,
+      id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date(),
+      read: false,
+    };
+
+    setNotifications(prev => {
+      const updated = [newNotification, ...prev];
+      localStorage.setItem("notifications", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <NotificationContext.Provider value={{ notifications, settings, markAsRead, markAllAsRead, updateSettings, unreadCount }}>
+    <NotificationContext.Provider value={{ notifications, settings, markAsRead, markAllAsRead, updateSettings, addNotification, unreadCount }}>
       {children}
     </NotificationContext.Provider>
   );

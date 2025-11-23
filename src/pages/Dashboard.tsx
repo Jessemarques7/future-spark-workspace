@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Smile, Frown, Meh, TrendingUp, BookOpen, Lightbulb, Zap, Award, Trophy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Smile, Frown, Meh, TrendingUp, BookOpen, Lightbulb, Zap, Award, Trophy, Wind, Sparkles, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGamification } from "@/contexts/GamificationContext";
+import { useAI } from "@/contexts/AIContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -24,12 +26,20 @@ const skills = [
 ];
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { level, currentXP, xpToNextLevel, badges } = useGamification();
+  const { priorityRecommendations, removePriorityRecommendation } = useAI();
   const [mood, setMood] = useState<string>("");
 
   const firstName = user?.name?.split(" ")[0] || "Usuário";
   const xpPercentage = (currentXP / xpToNextLevel) * 100;
+
+  const iconMap: Record<string, any> = {
+    Wind,
+    BookOpen,
+    Lightbulb,
+  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -158,6 +168,56 @@ export default function Dashboard() {
             <CardDescription>Personalizadas para você</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
+            {/* Priority Recommendations */}
+            {priorityRecommendations.map((rec) => {
+              const Icon = iconMap[rec.icon] || Sparkles;
+              return (
+                <motion.div
+                  key={rec.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="relative"
+                >
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/30">
+                    <div className="flex items-start gap-3">
+                      <div className="h-12 w-12 rounded-2xl bg-gradient-primary flex items-center justify-center flex-shrink-0">
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-sm">{rec.title}</h4>
+                            <Badge variant="secondary" className="text-xs">
+                              <Sparkles className="h-3 w-3 mr-1" />
+                              IA
+                            </Badge>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 hover:bg-destructive/10"
+                            onClick={() => removePriorityRecommendation(rec.id)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-3">{rec.description}</p>
+                        <Button
+                          size="sm"
+                          className="w-full"
+                          onClick={() => navigate(rec.actionRoute)}
+                        >
+                          {rec.actionText}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+
+            {/* Regular Recommendations */}
             {mockRecommendations.map((rec) => (
               <div
                 key={rec.id}

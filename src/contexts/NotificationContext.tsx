@@ -7,6 +7,7 @@ export interface Notification {
   description: string;
   read: boolean;
   createdAt: Date;
+  link?: string; // Optional navigation link
 }
 
 interface NotificationSettings {
@@ -35,6 +36,7 @@ const defaultNotifications: Notification[] = [
     description: "Você está 60% completo! Apenas 1h30 para finalizar.",
     read: false,
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    link: "/aprendizagem",
   },
   {
     id: "2",
@@ -43,6 +45,7 @@ const defaultNotifications: Notification[] = [
     description: "Você está focado há 2 horas. Que tal um alongamento?",
     read: false,
     createdAt: new Date(Date.now() - 30 * 60 * 1000),
+    link: "/bem-estar",
   },
   {
     id: "3",
@@ -51,6 +54,7 @@ const defaultNotifications: Notification[] = [
     description: "App de Reciclagem Inteligente combina com suas skills.",
     read: false,
     createdAt: new Date(Date.now() - 60 * 60 * 1000),
+    link: "/projetos",
   },
 ];
 

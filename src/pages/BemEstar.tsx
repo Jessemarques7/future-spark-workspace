@@ -44,6 +44,7 @@ export default function BemEstar() {
         type: "wellness",
         title: `Notei que você está ${moodText}`,
         description: "Que tal uma pausa estratégica? Um exercício de respiração pode ajudar.",
+        link: "/bem-estar/respiracao",
       });
 
       // Adicionar recomendação prioritária no Dashboard

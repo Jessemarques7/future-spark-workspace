@@ -232,7 +232,12 @@ export function Header() {
                     {notifications.map((notification) => (
                       <button
                         key={notification.id}
-                        onClick={() => markAsRead(notification.id)}
+                        onClick={() => {
+                          markAsRead(notification.id);
+                          if (notification.link) {
+                            navigate(notification.link);
+                          }
+                        }}
                         className={`w-full text-left p-3 rounded-lg hover:bg-muted transition-colors mb-1 ${
                           !notification.read ? "bg-primary/5" : ""
                         }`}
